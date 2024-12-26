@@ -1,0 +1,9 @@
+{
+    "rules": [
+      {
+        "pathPattern": "/play/**",
+        "apiPath": "https://flashtap.xyz/play/**"
+      }
+    ]
+  }
+  

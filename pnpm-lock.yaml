@@ -792,7 +792,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 22.10.2
 
   '@types/json5@0.0.29':
     optional: true
@@ -809,7 +809,7 @@ snapshots:
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 22.10.2
 
   '@types/ws@8.5.13':
     dependencies:
