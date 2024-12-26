@@ -2,7 +2,7 @@
     "rules": [
       {
         "pathPattern": "/play/**",
-        "apiPath": "https://flashtap.xyz/play/**"
+        "apiPath": "api/play/**"
       }
     ]
   }
