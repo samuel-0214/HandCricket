@@ -25,7 +25,7 @@ import {
   
   export const GET = async () => {
     const payload: Action = {
-      icon: "https://postimg.cc/zb07Y5nw",
+      icon: "https://i.postimg.cc/vTdN9ZTK/clean.jpg",
       label: "Play Hand Cricket ☝️ ✌️ 🖐️",
       title: "Play Hand Cricket ☝️ ✌️ 🖐️",
       description: "Play the Hand Cricket game",
@@ -161,7 +161,7 @@ import {
                 action: {
                   type: "action",
                   label: "Play Turn",
-                  icon: "https://postimg.cc/zb07Y5nw",
+                  icon: "https://i.postimg.cc/vTdN9ZTK/clean.jpg",
                   title: "Play Hand Cricket ☝️ ✌️ 🖐️",
                   description: "Play the Hand Cricket game",
                   links: {
