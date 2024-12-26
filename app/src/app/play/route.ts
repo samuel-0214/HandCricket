@@ -25,7 +25,7 @@ import {
   
   export const GET = async () => {
     const payload: Action = {
-      icon: `https://stock.adobe.com/in/images/attractive-editable-vector-cricket-game-in-action-design-great-for-your-design-resources-print-and-others/581304355`,
+      icon: "clean.jpg",
       label: "Play Hand Cricket ☝️ ✌️ 🖐️",
       title: "Play Hand Cricket ☝️ ✌️ 🖐️",
       description: "Play the Hand Cricket game",
@@ -161,7 +161,7 @@ import {
                 action: {
                   type: "action",
                   label: "Play Turn",
-                  icon: `https://stock.adobe.com/in/images/attractive-editable-vector-cricket-game-in-action-design-great-for-your-design-resources-print-and-others/581304355`,
+                  icon: "clean.jpg",
                   title: "Play Hand Cricket ☝️ ✌️ 🖐️",
                   description: "Play the Hand Cricket game",
                   links: {
