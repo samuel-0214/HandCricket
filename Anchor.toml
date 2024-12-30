@@ -4,14 +4,14 @@
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-hand_cricket = "BKY8UwwdM4cT5AUzJTL1yPUMcnPMpJy9BLk1g9ACcZMC"
+[programs.devnet]
+hand_cricket = "9VSaEJgoQg4XqkGqs7UCBUjtxVtdWhSVDrdkt7zJdvnL"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "https://api.devnet.solana.com"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
