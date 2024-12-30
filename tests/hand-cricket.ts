@@ -3,51 +3,48 @@ import { Program } from "@coral-xyz/anchor";
 import { HandCricket } from "../target/types/hand_cricket";
 import { assert } from "chai";
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 describe("hand-cricket", () => {
   // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.AnchorProvider.env());
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
 
   const program = anchor.workspace.HandCricket as Program<HandCricket>;
-
-  const provider = anchor.getProvider();
-  const player = anchor.Wallet.local();
+  const player = provider.wallet.publicKey; // Public key of the test wallet
   let gameAccount: anchor.web3.PublicKey;
 
-  // Helper function to fetch game state
-  const getGameState = async (gameAccountPublicKey: anchor.web3.PublicKey) => {
-    return await program.account.gameAccount.fetch(gameAccountPublicKey);
-  };
-
-  // Initialize game account
+  // Derive the PDA for the game account
   before(async () => {
     [gameAccount] = anchor.web3.PublicKey.findProgramAddressSync(
-      [player.publicKey.toBuffer()],
+      [player.toBuffer()],
       program.programId
     );
+    console.log(`Game account PDA: ${gameAccount.toBase58()}`);
   });
 
+  // Helper function to fetch the game state
+  const getGameState = async () => {
+    return await program.account.gameAccount.fetch(gameAccount);
+  };
+
   it("Initializes game when not active", async () => {
-    // Call playTurn with a valid choice
-    const playerChoice = 2;
+    const playerChoice = 2; // Valid choice to initialize the game
 
     await program.methods
       .playTurn(playerChoice)
-      .accountsStrict({
+      .accounts({
         gameAccount,
-        player: player.publicKey,
+        player: player,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .rpc();
 
-    const gameState = await getGameState(gameAccount);
-    assert.equal(gameState.isActive, true);
-    // Since the contract's choice is random, the score could be 0 or playerChoice
-    // We can only check that the player field is set correctly
-    assert.equal(gameState.player.toBase58(), player.publicKey.toBase58());
+    const gameState = await getGameState();
+    assert.equal(gameState.isActive, true, "Game should be active after initialization.");
+    assert.equal(
+      gameState.player.toBase58(),
+      player.toBase58(),
+      "Player public key should match the account's player field."
+    );
   });
 
   it("Rejects invalid player choices", async () => {
@@ -57,27 +54,27 @@ describe("hand-cricket", () => {
       try {
         await program.methods
           .playTurn(choice)
-          .accountsStrict({
+          .accounts({
             gameAccount,
-            player: player.publicKey,
+            player: player,
             systemProgram: anchor.web3.SystemProgram.programId,
           })
           .rpc();
         assert.fail("Should have thrown an error for invalid choice");
       } catch (err) {
-        // Expected error
-        assert.equal(err.error.errorCode.code, "InvalidChoice");
+        assert.equal(
+          err.error.errorCode.code,
+          "InvalidChoice",
+          "Expected error code for invalid choice"
+        );
       }
     }
   });
 
   it("Player scores runs when choices don't match", async () => {
-    // Assuming the game is active from previous test
-    const initialGameState = await getGameState(gameAccount);
+    const initialGameState = await getGameState();
     const initialScore = initialGameState.score;
 
-    // We need to ensure that player_choice != contract_choice
-    // Since we can't predict contract_choice, we can try multiple times
     let turnPlayed = false;
     let attempts = 0;
 
@@ -88,26 +85,33 @@ describe("hand-cricket", () => {
       try {
         await program.methods
           .playTurn(playerChoice)
-          .accountsStrict({
+          .accounts({
             gameAccount,
-            player: player.publicKey,
+            player: player,
             systemProgram: anchor.web3.SystemProgram.programId,
           })
           .rpc();
 
-        const gameState = await getGameState(gameAccount);
+        const gameState = await getGameState();
         if (gameState.isActive) {
-          // Choices didn't match, score should have increased
-          assert.equal(gameState.score, initialScore + playerChoice);
+          assert.equal(
+            gameState.score,
+            initialScore + playerChoice,
+            "Score should increase when choices don't match"
+          );
           turnPlayed = true;
         } else {
-          // Choices matched, game ended, start over
-          // Re-initialize the game
-          await sleep(1000); // wait for a second before retrying
+          await program.methods
+            .playTurn(1)
+            .accounts({
+              gameAccount,
+              player: player,
+              systemProgram: anchor.web3.SystemProgram.programId,
+            })
+            .rpc();
         }
       } catch (err) {
-        console.error("Error playing turn:", err);
-        assert.fail("Error playing turn");
+        assert.fail(`Error occurred during play turn: ${err}`);
       }
     }
 
@@ -117,9 +121,7 @@ describe("hand-cricket", () => {
   });
 
   it("Game ends when choices match", async () => {
-    // Assuming the game is active
-    const initialGameState = await getGameState(gameAccount);
-    const initialScore = initialGameState.score;
+    const initialGameState = await getGameState();
 
     let gameOver = false;
     let attempts = 0;
@@ -131,28 +133,20 @@ describe("hand-cricket", () => {
       try {
         await program.methods
           .playTurn(playerChoice)
-          .accountsStrict({
+          .accounts({
             gameAccount,
-            player: player.publicKey,
+            player: player,
             systemProgram: anchor.web3.SystemProgram.programId,
           })
           .rpc();
 
-        const gameState = await getGameState(gameAccount);
+        const gameState = await getGameState();
         if (!gameState.isActive) {
-          // Game over
           gameOver = true;
           console.log(`Game over with final score: ${gameState.score}`);
-          // The score should be as before or increased by player's choice
-          // We can't guarantee what it will be due to randomness
-        } else {
-          // Game is still active, continue
-          // Sleep before next attempt
-          await sleep(1000);
         }
       } catch (err) {
-        console.error("Error playing turn:", err);
-        assert.fail("Error playing turn");
+        assert.fail(`Error occurred during game end check: ${err}`);
       }
     }
 
@@ -162,104 +156,52 @@ describe("hand-cricket", () => {
   });
 
   it("Score increases appropriately", async () => {
-    // Start a new game
-    // Ensure game is not active
-    let gameState = await getGameState(gameAccount);
-    if (gameState.isActive) {
-      // End the game by forcing choices to match
-      let gameOver = false;
-      while (!gameOver) {
-        const playerChoice = 1; // Choose a number
-        try {
-          await program.methods
-            .playTurn(playerChoice)
-            .accountsStrict({
-              gameAccount,
-              player: player.publicKey,
-              systemProgram: anchor.web3.SystemProgram.programId,
-            })
-            .rpc();
-          gameState = await getGameState(gameAccount);
-          if (!gameState.isActive) {
-            gameOver = true;
-          } else {
-            await sleep(1000); // Wait a bit before next attempt
-          }
-        } catch (err) {
-          console.error("Error playing turn:", err);
-          assert.fail("Error playing turn");
-        }
-      }
-    }
-
-    // Now start a new game
-    const initialScore = 0;
     const playerChoice = 4;
 
     await program.methods
       .playTurn(playerChoice)
-      .accountsStrict({
+      .accounts({
         gameAccount,
-        player: player.publicKey,
+        player: player,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .rpc();
 
-    gameState = await getGameState(gameAccount);
-    if (gameState.isActive) {
-      // Choices didn't match, score should be increased by player's choice
-      assert.equal(gameState.score, initialScore + playerChoice);
-    } else {
-      // Choices matched, game ended, score should be zero
-      assert.equal(gameState.score, initialScore);
-    }
+    const gameState = await getGameState();
+    assert.equal(
+      gameState.score,
+      playerChoice,
+      "Score should increase by player's choice when choices don't match"
+    );
   });
 
   it("Allows multiple plays within the same game", async () => {
-    // Ensure game is active
-    let gameState = await getGameState(gameAccount);
-    if (!gameState.isActive) {
-      // Start a new game
-      const playerChoice = 3;
-      await program.methods
-        .playTurn(playerChoice)
-        .accountsStrict({
-          gameAccount,
-          player: player.publicKey,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .rpc();
-      gameState = await getGameState(gameAccount);
-    }
-
-    // Play multiple turns
+    let totalScore = 0;
     let gameOver = false;
-    let totalScore = gameState.score;
 
     for (let i = 0; i < 5 && !gameOver; i++) {
       const playerChoice = Math.floor(Math.random() * 6) + 1; // Random choice
+
       try {
         await program.methods
           .playTurn(playerChoice)
-          .accountsStrict({
+          .accounts({
             gameAccount,
-            player: player.publicKey,
+            player: player,
             systemProgram: anchor.web3.SystemProgram.programId,
           })
           .rpc();
-        gameState = await getGameState(gameAccount);
+
+        const gameState = await getGameState();
         if (gameState.isActive) {
           totalScore += playerChoice;
           assert.equal(gameState.score, totalScore);
         } else {
-          // Game over
           gameOver = true;
           console.log(`Game over with final score: ${gameState.score}`);
         }
-        await sleep(1000); // Wait before next turn
       } catch (err) {
-        console.error("Error playing turn:", err);
-        assert.fail("Error playing turn");
+        assert.fail(`Error during multiple plays: ${err}`);
       }
     }
   });

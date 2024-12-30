@@ -17,7 +17,7 @@ import {
 } from "@solana/web3.js";
 
 const headers = createActionHeaders();
-const PROGRAM_ID = new PublicKey("9VSaEJgoQg4XqkGqs7UCBUjtxVtdWhSVDrdkt7zJdvnL");
+const PROGRAM_ID = new PublicKey("7tuKuppYmHV69KKakus2ztV81YrgvWx3vdbhGhxwF8uh");
 
 // Helper function to generate computer's move
 const getComputerMove = () => Math.floor(Math.random() * 6) + 1;
