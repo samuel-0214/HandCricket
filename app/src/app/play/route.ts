@@ -27,7 +27,7 @@ const scoreMap = new Map<string, number>();
 
 export const GET = async () => {
   const payload: Action = {
-    icon: "https://i.postimg.cc/vTdN9ZTK/clean.jpg",
+    icon: "https://i.postimg.cc/52hr198Z/mainblink.png",
     label: "Play Hand Cricket ☝️ ✌️ 🖐️",
     title: "Play Hand Cricket ☝️ ✌️ 🖐️",
     description: "Play the Hand Cricket game",
@@ -144,7 +144,7 @@ export const POST = async (req: Request) => {
               action: {
                 type: "action",
                 label: "Game Over",
-                icon: "https://i.postimg.cc/vTdN9ZTK/clean.jpg",
+                icon: "https://i.postimg.cc/52hr198Z/mainblink.png",
                 title: "Hand Cricket - Game Over! 🏏",
                 description: `Game Over! Final Score: ${currentScore} runs 🎯`,
                 links: {
@@ -156,7 +156,7 @@ export const POST = async (req: Request) => {
               action: {
                 type: "action",
                 label: "Play Turn",
-                icon: "https://i.postimg.cc/vTdN9ZTK/clean.jpg",
+                icon: "https://i.postimg.cc/52hr198Z/mainblink.png",
                 title: "Play Hand Cricket ☝️ ✌️ 🖐️",
                 description: `Current Score: ${currentScore} runs. Play your next turn! 🏏`,
                 links: {
