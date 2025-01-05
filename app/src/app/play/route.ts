@@ -148,7 +148,13 @@ export const POST = async (req: Request) => {
                 title: "Hand Cricket - Game Over! 🏏",
                 description: `Game Over! Final Score: ${currentScore} runs 🎯`,
                 links: {
-                  actions: [] // No more actions available when out
+                  actions: [
+                    {
+                      type: "transaction",
+                      label: "Play Again",
+                      href: `/play/`,
+                    },
+                  ] // No more actions available when out
                 },
               }
             } : {
