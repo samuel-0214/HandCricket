@@ -149,11 +149,6 @@ export const POST = async (req: Request) => {
                 description: `Game Over! Final Score: ${currentScore} runs 🎯`,
                 links: {
                   actions: [
-                    {
-                      type: "transaction",
-                      label: "Play Again",
-                      href: `play/`,
-                    },
                   ] // No more actions available when out
                 },
               }
