@@ -152,7 +152,7 @@ export const POST = async (req: Request) => {
                     {
                       type: "transaction",
                       label: "Play Again",
-                      href: `/play/`,
+                      href: `play/`,
                     },
                   ] // No more actions available when out
                 },
