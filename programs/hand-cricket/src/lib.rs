@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::hash::hashv};
 
-declare_id!("7tuKuppYmHV69KKakus2ztV81YrgvWx3vdbhGhxwF8uh");
+declare_id!("Grae51jHzhZBC6HdMrZvf8f1qYBnFBXXfrpziKD34hBu");
 
 #[program]
 pub mod hand_cricket {

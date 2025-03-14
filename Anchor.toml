@@ -4,15 +4,15 @@
 resolution = true
 skip-lint = false
 
-[programs.devnet]
-hand_cricket = "7tuKuppYmHV69KKakus2ztV81YrgvWx3vdbhGhxwF8uh"
+[programs.mainnet]
+hand_cricket = "Grae51jHzhZBC6HdMrZvf8f1qYBnFBXXfrpziKD34hBu"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "https://api.devnet.solana.com"
-wallet = "~/.config/solana/id.json"
+cluster = "https://api.mainnet-beta.solana.com"
+wallet = "~/.config/solana/wallet.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
