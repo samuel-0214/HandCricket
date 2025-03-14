@@ -150,8 +150,22 @@ export const POST = async (req: Request) => {
                 links: {
                   actions: [
                     {
-                      type: "post",
+                      type: "transaction",
                       label: "Play Again",
+                      parameters: [
+                        {
+                          type: "radio",
+                          name: "options",
+                          options: [
+                            { label: "Play 1", value: "1", selected: false },
+                            { label: "Play 2", value: "2", selected: false },
+                            { label: "Play 3", value: "3", selected: false },
+                            { label: "Play 4", value: "4", selected: false },
+                            { label: "Play 5", value: "5", selected: false },
+                            { label: "Play 6", value: "6", selected: false },
+                          ],
+                        },
+                      ],
                       href: `/play/`, // Restart game
                     },
                   ] 
