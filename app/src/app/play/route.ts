@@ -150,7 +150,7 @@ export const POST = async (req: Request) => {
                 links: {
                   actions: [
                     {
-                      type: "transaction",
+                      type: "post",
                       label: "Play Again",
                       href: `/play/`, // Restart game
                     },
